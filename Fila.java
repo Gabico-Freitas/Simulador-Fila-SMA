@@ -1,8 +1,12 @@
+import java.util.LinkedList;
+import java.util.Queue;
+
 public class Fila{
     private double anterior;
     private int a;
     private int c;
     private int m;
+    private Queue<Integer> q;
 
     public enum TipoEvento {
         CHEGADA,
@@ -14,6 +18,7 @@ public class Fila{
         this.a = a;
         this.c = c;
         this.m = m;
+        this.q = new LinkedList<>();
     }
 
     public double NextRandom(){
@@ -28,11 +33,14 @@ public class Fila{
     
     public int Chegada(){
         // evento de chegada
-        return 0;
+        c++;
+        q.add(c);
+        return q.size();
     }
     public int Saida(){
         // evento de saida
-        return 0;
+        return q.size(); // retorna tamanho da fila
+        // return q.remove(); // alternativa para retornar elemento removido
     }
     
 }
