@@ -23,6 +23,27 @@ public class Escalonador {
         eventos.add(e);
     }
 
+    public Evento getProxEvento() {
+        Evento resp = null;
+        double tempo = Double.MAX_VALUE;
+        for (int i = 0; i < eventos.size(); i++) {
+            if (eventos.get(i).tipo == Tipo.CHEGADA) {
+                if (eventos.get(i).tEntrada < tempo) {
+                    resp = eventos.get(i);
+                    tempo = eventos.get(i).tEntrada;
+                }
+            }
+            if (eventos.get(i).tipo == Tipo.SAIDA) {
+                if (eventos.get(i).tSaida < tempo) {
+                    resp = eventos.get(i);
+                    tempo = eventos.get(i).tSaida;
+                }
+            }
+        }
+
+        return resp;
+    }
+
     // Classe para ser utilizada como uma forma de "tabela" para verificar qual será
     // o próximo evento a ocorrer (depende do tempo)
 }

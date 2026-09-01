@@ -21,11 +21,6 @@ public class Fila{
         this.q = new LinkedList<>();
     }
 
-    public double NextRandom(){
-        anterior = (a*anterior+c)%m;
-        return (double)anterior/m;
-    }
-
     public Fila.TipoEvento NextEvent(){
         // ler o proximo evento da tabela
         return Fila.TipoEvento.CHEGADA;
