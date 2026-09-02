@@ -26,21 +26,24 @@ public class Escalonador {
     public Evento getProxEvento() {
         Evento resp = null;
         double tempo = Double.MAX_VALUE;
+        int aux = 0;
         for (int i = 0; i < eventos.size(); i++) {
             if (eventos.get(i).tipo == Tipo.CHEGADA) {
                 if (eventos.get(i).tEntrada < tempo) {
                     resp = eventos.get(i);
                     tempo = eventos.get(i).tEntrada;
+                    // aux = i;
                 }
             }
             if (eventos.get(i).tipo == Tipo.SAIDA) {
-                if (eventos.get(i).tSaida < tempo) {
+                if (eventos.get(i).tEntrada < tempo) {
                     resp = eventos.get(i);
-                    tempo = eventos.get(i).tSaida;
+                    tempo = eventos.get(i).tEntrada;
+                    // aux = i;
                 }
             }
         }
-
+        eventos.remove(resp);
         return resp;
     }
 

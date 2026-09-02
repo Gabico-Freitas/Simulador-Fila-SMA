@@ -11,8 +11,12 @@ public class Aleatorio {
         this.anterior = seed;
     }
     
-    public double NextRandom(){
+    private double NextRandom(){
         anterior = (a*anterior+c)%M;
         return (double)anterior/M;
+    }
+
+    public double proxTempo (double a, double b) {
+        return a + ((b-a) * NextRandom());
     }
 }
