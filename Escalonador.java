@@ -1,9 +1,9 @@
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class Escalonador {
     // public double saida;
     // public double chegada;
-    private ArrayList<Evento> eventos;
+    private LinkedList<Evento> eventos;
 
     /*
     public Escalonador (double chegada, double saida) {
@@ -14,7 +14,7 @@ public class Escalonador {
     */
 
     public Escalonador() {
-        this.eventos = new ArrayList<>();
+        this.eventos = new LinkedList<>();
     }
 
     // adiciona evento no index fornecido
@@ -32,18 +32,18 @@ public class Escalonador {
                 if (eventos.get(i).tEntrada < tempo) {
                     resp = eventos.get(i);
                     tempo = eventos.get(i).tEntrada;
-                    // aux = i;
+                    aux = i;
                 }
             }
             if (eventos.get(i).tipo == Tipo.SAIDA) {
                 if (eventos.get(i).tEntrada < tempo) {
                     resp = eventos.get(i);
                     tempo = eventos.get(i).tEntrada;
-                    // aux = i;
+                    aux = i;
                 }
             }
         }
-        eventos.remove(resp);
+        if (tempo != Double.MAX_VALUE) eventos.remove(aux);
         return resp;
     }
 
