@@ -35,8 +35,8 @@ public class App {
         esc.add(inicio);
         
 
-        // int count = 100000; // 100.000 que foi pedido no módulo
-        int count = 6;
+        int count = 100000; // 100.000 que foi pedido no módulo
+        // int count = 6;
         while (count > 0) {
             Evento evento = esc.getProxEvento(); //Verifica o arraylist para pegar o próximo evento 
             
