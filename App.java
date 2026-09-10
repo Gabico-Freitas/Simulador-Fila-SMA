@@ -35,37 +35,41 @@ public class App {
         esc.add(inicio);
         
 
-        int count = 6; // Não foi possível fazer com os 100.000 que foi pedido no módulo
-        // int count = 6;
+        int count = 100000;
         while (count > 0) {
-            Evento evento = esc.getProxEvento(); //Verifica o arraylist para pegar o próximo evento 
+            Evento evento = esc.getProxEvento(); //Verifica o escalonador para pegar o próximo evento
+
+            // Insere o tempo que se passou entre o evento anterior ao evento a ocorrer no momento
+            // na leitura de dados de cada espaço de fila e o tempo global
+            tempoAux = evento.tEntrada - tempoGlobal;
+            tempos[clientesNaFila] += tempoAux;
+            tempoGlobal = evento.tEntrada; 
             
+            // Caso for chegada verifica se a fila está cheia
             if (evento.tipo == Tipo.CHEGADA) {
+                // Caso esteja cheia, somente incrementa o contador de clientes perdidos
                 if (clientesNaFila >= K) {
-                    // System.out.println("Fila cheia!");
                     clientesPerdidos++;
                 } else {
-                    tempoAux = evento.tEntrada - tempoGlobal;
-                    tempos[clientesNaFila] += tempoAux;
-                    tempoGlobal = evento.tEntrada; 
+                    // Se ela não estiver cheia insere o processo na fila e verifica se já pode ser contabilizado uma saída para ele
+                    // (depende da quantidade de servidores)
                     clientesNaFila++;
                     if (clientesNaFila <= qtdServidores) {
                         esc.add(new Evento(tempoGlobal + rnd.proxTempo(aSaida, bSaida), Tipo.SAIDA));
                     }
-
-                    esc.add(new Evento(tempoGlobal + rnd.proxTempo(aChegada,bChegada), Tipo.CHEGADA));
                 }
+
+                // Insere um novo evento de chegada (não deve depender se a fila está cheia ou não)
+                esc.add(new Evento(tempoGlobal + rnd.proxTempo(aChegada,bChegada), Tipo.CHEGADA));
+
             } else if (evento.tipo == Tipo.SAIDA) {
-                tempoAux = evento.tEntrada - tempoGlobal;
-                tempos[clientesNaFila] += tempoAux;
-                tempoGlobal = evento.tEntrada;
+                // Decrementa o contador de clientes na fila e já prepara a próxima saída
                 clientesNaFila--;
                 if (clientesNaFila >= qtdServidores) {
                     esc.add(new Evento(tempoGlobal + rnd.proxTempo(aSaida, bSaida), Tipo.SAIDA));
                 }
-
-                // clientesNaFila = fila.Saida();
             }
+            // Decrementa o count para o loop
             count--;
         }
 

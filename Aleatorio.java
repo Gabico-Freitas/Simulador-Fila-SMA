@@ -11,11 +11,14 @@ public class Aleatorio {
         this.anterior = seed;
     }
     
+    // Cria o valor pseudo aleatório
     private double NextRandom(){
         anterior = (a*anterior+c)%M;
         return (double)anterior/M;
     }
 
+    // Calcula o próximo tempo para o evento
+    // (Irá depender a entrada irá depender se for uma chegada ou uma saída)
     public double proxTempo (double a, double b) {
         return a + ((b-a) * NextRandom());
     }

@@ -17,32 +17,25 @@ public class Escalonador {
         this.eventos = new LinkedList<>();
     }
 
-    // adiciona evento no index fornecido
-    // TODO: tempos sao em double, percorrer arraylist para descobrir onde cai
+    // Adiciona o evento na lista
     public void add(Evento e) {
         eventos.add(e);
     }
 
+    // Busca qual é o evento com o menor tempo e o retorna como resposta
+    // (Apaga ele da lista no final da execução)
     public Evento getProxEvento() {
         Evento resp = null;
         double tempo = Double.MAX_VALUE;
         int aux = 0;
         for (int i = 0; i < eventos.size(); i++) {
-            if (eventos.get(i).tipo == Tipo.CHEGADA) {
-                if (eventos.get(i).tEntrada < tempo) {
-                    resp = eventos.get(i);
-                    tempo = eventos.get(i).tEntrada;
-                    aux = i;
-                }
-            }
-            if (eventos.get(i).tipo == Tipo.SAIDA) {
-                if (eventos.get(i).tEntrada < tempo) {
-                    resp = eventos.get(i);
-                    tempo = eventos.get(i).tEntrada;
-                    aux = i;
-                }
+            if (eventos.get(i).tEntrada < tempo) {
+                resp = eventos.get(i);
+                tempo = eventos.get(i).tEntrada;
+                aux = i;
             }
         }
+        
         if (tempo != Double.MAX_VALUE) eventos.remove(aux);
         return resp;
     }
