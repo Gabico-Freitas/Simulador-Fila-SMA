@@ -6,20 +6,33 @@ public class App {
     //      Executar: java App <qtdServidores> <K>
     // ******************************************
     public static void main(String[] args) {
-        // Quantidade de servidores disponíveis para o atendimento da fila
-        int qtdServidores = Integer.parseInt(args[0]);
-        // Tamanho máximo da fila
-        int K = Integer.parseInt(args[1]);
+        // Quantidade de servidores disponíveis para o atendimento da fila1
+        int qtdServidores1 = Integer.parseInt(args[0]);
+        // Tamanho máximo da fila1
+        int K1 = Integer.parseInt(args[1]);
+        
+        // Quantidade de servidores disponíveis para o atendimento da fila2
+        int qtdServidores2 = Integer.parseInt(args[2]);
+        // Tamanho máximo da fila2
+        int K2 = Integer.parseInt(args[3]);
+
         // Tempo total da simulação
         double tempoGlobal = 0;
         // Criação do escalonador, nele fica guardado os próximos eventos, ele decide qual será o próximo pelo tempo mais recente
         Escalonador esc = new Escalonador();
         // Variáveis para o cálculo dos valores pseudoaleatórios de tempo de chegada
         double minArrival = 1, maxArrival = 5;
+        // Variáveis para o cálculo dos valores pseudoaleatórios de tempo de passagem
+        double minPass = 4, maxPass = 5;
         // Variáveis para o cálculo dos valores pseudoaleatórios de tempo de saída
-        double minService = 4, maxService = 5;
+        double minService = 1, maxService = 3;
         // Variável auxiliar para guardar o tempo que se passou do último evento para inserir na lista de tempos
         double tempoAux = 0;
+
+        if (args.length < 4) {
+            System.out.println("Erro. Insira no formato:\n java App <qtdServidores1> <K1> <qtdServidores2> <K2>");
+            System.exit(0);
+        }
 
         // Esses valores precisam ser alterador para o teste
         Aleatorio rnd = new Aleatorio(1103, 12345, 429496, 157987);
@@ -29,10 +42,10 @@ public class App {
         esc.add(inicio);
 
         //Criação da fila1 (será a que os clientes chegarão primeiro)
-        Fila fila1 = new Fila(qtdServidores, K, minArrival, maxArrival, minService, maxService);
+        Fila fila1 = new Fila(qtdServidores1, K1);
 
         // Criação da fila2 (irá ser a atendida pelos servidores)
-        Fila fila2 = new Fila(qtdServidores, K, minArrival, maxArrival, minService, maxService);
+        Fila fila2 = new Fila(qtdServidores2, K2);
 
         int count = 100000;
         while (count > 0) {
@@ -50,7 +63,7 @@ public class App {
                     if (fila1.status() < fila1.capacity()) {
                         fila1.in();
                         if (fila1.status() <= fila1.servers()) {
-                            esc.add(new Evento(tempoGlobal + rnd.proxTempo(minService, maxService), Tipo.PASSAGEM));
+                            esc.add(new Evento(tempoGlobal + rnd.proxTempo(minPass, maxPass), Tipo.PASSAGEM));
                         }
                     } else {
                         fila1.incLoss();
@@ -61,7 +74,7 @@ public class App {
                     fila1.incTempo(tempoAux);
                     fila1.out();
                     if (fila1.status() >= fila1.servers()) {
-                        esc.add(new Evento(tempoGlobal + rnd.proxTempo(minService, maxService), Tipo.PASSAGEM));
+                        esc.add(new Evento(tempoGlobal + rnd.proxTempo(minPass, maxPass), Tipo.PASSAGEM));
                     }
                     if (fila2.status() < fila2.capacity()) {
                         fila2.in();
@@ -114,15 +127,18 @@ public class App {
 
         System.out.println("Tempos da fila 1: ");
         double tempos[] = fila1.getTimes();
-        for (int i = 0; i < K + 1; i++) {
+        for (int i = 0; i < K1 + 1; i++) {
             System.out.println(i + ": " + tempos[i] + " (" + ((tempos[i]/tempoGlobal)*100) + "%)");
         }
-        System.out.println("\n\nTempos da fila 2: ");
+        System.out.println("\nTempos da fila 2: ");
         double tempos2[] = fila2.getTimes();
-        for (int i = 0; i < K + 1; i++) {
+        for (int i = 0; i < K2 + 1; i++) {
             System.out.println(i + ": " + tempos2[i] + " (" + ((tempos2[i]/tempoGlobal)*100) + "%)");
         }
-        System.out.println("Clientes perdidos: " + fila1.loss()+fila2.loss());
+        int perdaTotal = fila1.loss()+fila2.loss();
+        System.out.println("Clientes perdidos: " + perdaTotal);
+        System.out.println("(Perdidos fila1: " + fila1.loss() + ")");
+        System.out.println("(Perdidos fila2: " + fila2.loss() + ")");
         System.out.println("Tempo total em simulação: " + tempoGlobal);
     }
 }
