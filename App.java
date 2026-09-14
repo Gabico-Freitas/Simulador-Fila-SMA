@@ -3,7 +3,7 @@ public class App {
     // ******************************************
     // PARA RODAR:
     //      Compilar: javac *.java
-    //      Executar: java App <qtdServidores> <K>
+    //      Executar: java App <qtdServidores1> <K1> <qtdServidores2> <K2>
     // ******************************************
     public static void main(String[] args) {
         // Quantidade de servidores disponíveis para o atendimento da fila1
@@ -38,7 +38,7 @@ public class App {
         Aleatorio rnd = new Aleatorio(1103, 12345, 429496, 157987);
 
         // Isso aqui não altera (pelo menos não nessa entrega)
-        Evento inicio = new Evento(3.0, Tipo.CHEGADA);
+        Evento inicio = new Evento(2.5, Tipo.CHEGADA);
         esc.add(inicio);
 
         //Criação da fila1 (será a que os clientes chegarão primeiro)
@@ -72,6 +72,7 @@ public class App {
                     break;
                 case Tipo.PASSAGEM:
                     fila1.incTempo(tempoAux);
+                    fila2.incTempo(tempoAux);
                     fila1.out();
                     if (fila1.status() >= fila1.servers()) {
                         esc.add(new Evento(tempoGlobal + rnd.proxTempo(minPass, maxPass), Tipo.PASSAGEM));
