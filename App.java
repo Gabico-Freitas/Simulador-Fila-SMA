@@ -37,14 +37,14 @@ public class App {
         // Esses valores precisam ser alterador para o teste
         Aleatorio rnd = new Aleatorio(1103, 12345, 429496, 157987);
 
-        // Isso aqui não altera (pelo menos não nessa entrega)
+        // Inicia um evento inicial para inserir uma chegada de cliente novo no tempo desejado
         Evento inicio = new Evento(2.5, Tipo.CHEGADA);
         esc.add(inicio);
 
         //Criação da fila1 (será a que os clientes chegarão primeiro)
         Fila fila1 = new Fila(qtdServidores1, K1);
 
-        // Criação da fila2 (irá ser a atendida pelos servidores)
+        // Criação da fila2 (irá ser a atendida pelos servidores após passar pela fila1)
         Fila fila2 = new Fila(qtdServidores2, K2);
 
         int count = 100000;
@@ -56,10 +56,13 @@ public class App {
 
             tempoAux = evento.tEntrada - tempoGlobal;
             tempoGlobal = evento.tEntrada;
+            
+            fila1.incTempo(tempoAux);
+            fila2.incTempo(tempoAux);
 
             switch (evento.tipo) {
                 case Tipo.CHEGADA:
-                    fila1.incTempo(tempoAux);
+                    // fila1.incTempo(tempoAux);
                     if (fila1.status() < fila1.capacity()) {
                         fila1.in();
                         if (fila1.status() <= fila1.servers()) {
@@ -71,8 +74,8 @@ public class App {
                     esc.add(new Evento(tempoGlobal + rnd.proxTempo(minArrival,maxArrival), Tipo.CHEGADA));
                     break;
                 case Tipo.PASSAGEM:
-                    fila1.incTempo(tempoAux);
-                    fila2.incTempo(tempoAux);
+                    // fila1.incTempo(tempoAux);
+                    // fila2.incTempo(tempoAux);
                     fila1.out();
                     if (fila1.status() >= fila1.servers()) {
                         esc.add(new Evento(tempoGlobal + rnd.proxTempo(minPass, maxPass), Tipo.PASSAGEM));
@@ -87,7 +90,7 @@ public class App {
                     }
                     break;
                 case Tipo.SAIDA:
-                    fila2.incTempo(tempoAux);
+                    // fila2.incTempo(tempoAux);
                     fila2.out();
                     if (fila2.status() >= fila2.servers()) {
                         esc.add(new Evento(tempoGlobal + rnd.proxTempo(minService, maxService), Tipo.SAIDA));
@@ -97,40 +100,26 @@ public class App {
                 default:
                     break;
             }
-            
-            // Caso for chegada verifica se a fila está cheia
-            // if (evento.tipo == Tipo.CHEGADA) {
-            //     // Caso esteja cheia, somente incrementa o contador de clientes perdidos
-            //     if (clientesNaFila >= K) {
-            //         clientesPerdidos++;
-            //     } else {
-            //         // Se ela não estiver cheia insere o processo na fila e verifica se já pode ser contabilizado uma saída para ele
-            //         // (depende da quantidade de servidores)
-            //         clientesNaFila++;
-            //         if (clientesNaFila <= qtdServidores) {
-            //             esc.add(new Evento(tempoGlobal + rnd.proxTempo(aSaida, bSaida), Tipo.SAIDA));
-            //         }
-            //     }
-
-            //     // Insere um novo evento de chegada (não deve depender se a fila está cheia ou não)
-            //     esc.add(new Evento(tempoGlobal + rnd.proxTempo(aChegada,bChegada), Tipo.CHEGADA));
-
-            // } else if (evento.tipo == Tipo.SAIDA) {
-            //     // Decrementa o contador de clientes na fila e já prepara a próxima saída
-            //     clientesNaFila--;
-            //     if (clientesNaFila >= qtdServidores) {
-            //         esc.add(new Evento(tempoGlobal + rnd.proxTempo(aSaida, bSaida), Tipo.SAIDA));
-            //     }
-            // }
-            // Decrementa o count para o loop
             count--;
         }
+
+        System.out.println("============================================");
+        System.out.println("Fila1 (G/G/" + qtdServidores1 + "/" + K1 + ")");
+        System.out.println("Chegada: " + minArrival + " ... " + maxArrival);
+        System.out.println("Passagem: " + minPass + " ... " + maxPass);
+        System.out.println("============================================");
 
         System.out.println("Tempos da fila 1: ");
         double tempos[] = fila1.getTimes();
         for (int i = 0; i < K1 + 1; i++) {
             System.out.println(i + ": " + tempos[i] + " (" + ((tempos[i]/tempoGlobal)*100) + "%)");
         }
+        
+        System.out.println("============================================");
+        System.out.println("Fila2 (G/G/" + qtdServidores2 + "/" + K2 + ")");
+        System.out.println("Saida: " + minService + " ... " + maxService);
+        System.out.println("============================================");
+
         System.out.println("\nTempos da fila 2: ");
         double tempos2[] = fila2.getTimes();
         for (int i = 0; i < K2 + 1; i++) {
