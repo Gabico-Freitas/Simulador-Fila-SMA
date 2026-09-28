@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class App {
 
     // ******************************************
@@ -37,8 +39,10 @@ public class App {
         // Esses valores precisam ser alterador para o teste
         Aleatorio rnd = new Aleatorio(1103, 12345, 429496, 157987);
 
+        ArrayList<Fila> listaFilas = new ArrayList<>();
+
         // Inicia um evento inicial para inserir uma chegada de cliente novo no tempo desejado
-        Evento inicio = new Evento(2.5, Tipo.CHEGADA);
+        Evento inicio = new Evento(2.5, Tipo.CHEGADA, -1, 1);
         esc.add(inicio);
 
         //Criação da fila1 (será a que os clientes chegarão primeiro)
@@ -62,38 +66,34 @@ public class App {
 
             switch (evento.tipo) {
                 case Tipo.CHEGADA:
-                    // fila1.incTempo(tempoAux);
                     if (fila1.status() < fila1.capacity()) {
                         fila1.in();
                         if (fila1.status() <= fila1.servers()) {
-                            esc.add(new Evento(tempoGlobal + rnd.proxTempo(minPass, maxPass), Tipo.PASSAGEM));
+                            esc.add(new Evento(tempoGlobal + rnd.aleatorio(minPass, maxPass), Tipo.PASSAGEM));
                         }
                     } else {
                         fila1.incLoss();
                     }
-                    esc.add(new Evento(tempoGlobal + rnd.proxTempo(minArrival,maxArrival), Tipo.CHEGADA));
+                    esc.add(new Evento(tempoGlobal + rnd.aleatorio(minArrival,maxArrival), Tipo.CHEGADA));
                     break;
                 case Tipo.PASSAGEM:
-                    // fila1.incTempo(tempoAux);
-                    // fila2.incTempo(tempoAux);
                     fila1.out();
                     if (fila1.status() >= fila1.servers()) {
-                        esc.add(new Evento(tempoGlobal + rnd.proxTempo(minPass, maxPass), Tipo.PASSAGEM));
+                        esc.add(new Evento(tempoGlobal + rnd.aleatorio(minPass, maxPass), Tipo.PASSAGEM));
                     }
                     if (fila2.status() < fila2.capacity()) {
                         fila2.in();
                         if (fila2.status() <= fila2.servers()) {
-                            esc.add(new Evento(tempoGlobal + rnd.proxTempo(minService, maxService), Tipo.SAIDA));
+                            esc.add(new Evento(tempoGlobal + rnd.aleatorio(minService, maxService), Tipo.SAIDA));
                         }
                     } else {
                         fila2.incLoss();
                     }
                     break;
                 case Tipo.SAIDA:
-                    // fila2.incTempo(tempoAux);
                     fila2.out();
                     if (fila2.status() >= fila2.servers()) {
-                        esc.add(new Evento(tempoGlobal + rnd.proxTempo(minService, maxService), Tipo.SAIDA));
+                        esc.add(new Evento(tempoGlobal + rnd.aleatorio(minService, maxService), Tipo.SAIDA));
                     }
                     break;
             
@@ -115,12 +115,12 @@ public class App {
             System.out.println(i + ": " + tempos[i] + " (" + ((tempos[i]/tempoGlobal)*100) + "%)");
         }
         
-        System.out.println("============================================");
+        System.out.println("\n============================================");
         System.out.println("Fila2 (G/G/" + qtdServidores2 + "/" + K2 + ")");
         System.out.println("Saida: " + minService + " ... " + maxService);
         System.out.println("============================================");
 
-        System.out.println("\nTempos da fila 2: ");
+        System.out.println("Tempos da fila 2: ");
         double tempos2[] = fila2.getTimes();
         for (int i = 0; i < K2 + 1; i++) {
             System.out.println(i + ": " + tempos2[i] + " (" + ((tempos2[i]/tempoGlobal)*100) + "%)");

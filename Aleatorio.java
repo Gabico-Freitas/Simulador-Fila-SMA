@@ -19,7 +19,7 @@ public class Aleatorio {
 
     // Calcula o próximo tempo para o evento
     // (Irá depender a entrada irá depender se for uma chegada ou uma saída)
-    public double proxTempo (double a, double b) {
+    public double aleatorio (double a, double b) {
         return a + ((b-a) * NextRandom());
     }
 }
