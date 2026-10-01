@@ -1,3 +1,5 @@
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 public class App {
@@ -8,6 +10,24 @@ public class App {
     //      Executar: java App <qtdServidores1> <K1> <qtdServidores2> <K2>
     // ******************************************
     public static void main(String[] args) {
+        if (args[0].startsWith("-filename")) {
+            // Ler arquivo .yml
+            String filename = args[1];
+            File f = new File(filename);
+            try  {
+                YmlReader yml = YmlReader.read(f);
+
+                System.out.println(yml.toString());
+            }
+            catch (FileNotFoundException e) {
+            System.out.printf("File \"%s\" was not found.\n", filename);
+            }
+            catch (NumberFormatException e) {
+                System.out.println("Invalid number in file: " + e.getMessage());
+            }
+        }
+        // colocar o resto num else?
+        
         // Quantidade de servidores disponíveis para o atendimento da fila1
         int qtdServidores1 = Integer.parseInt(args[0]);
         // Tamanho máximo da fila1

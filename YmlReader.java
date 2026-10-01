@@ -54,7 +54,7 @@ public class YmlReader {
         SEEDS
     }
 
-    public static YmlReader ler(File f) throws FileNotFoundException {
+    public static YmlReader read(File f) throws FileNotFoundException {
         YmlReader data = new YmlReader();
         Block b = Block.NONE;
         ConfigFila currentQ = null;
@@ -179,9 +179,8 @@ public class YmlReader {
         File f = new File(filename);
 
         try {
-            YmlReader d = ler(f);
+            YmlReader d = read(f);
 
-            // TRATAR AQUI OS VALORES OBTIDOS
             System.out.println("== arrivals ==");
             d.arrivals.forEach((q, t) -> System.out.println(q + ": " + t));
 
