@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class App {
 
@@ -9,15 +10,19 @@ public class App {
     //      Compilar: javac *.java
     //      Executar: java App <qtdServidores1> <K1> <qtdServidores2> <K2>
     // ******************************************
+
     public static void main(String[] args) {
+        YmlReader yml = new YmlReader();
+        ArrayList<Fila> listaFilas = new ArrayList<>();
+
         if (args[0].startsWith("-filename")) {
             // Ler arquivo .yml
             String filename = args[1];
             File f = new File(filename);
             try  {
-                YmlReader yml = YmlReader.read(f);
+                yml = yml.read(f);
 
-                System.out.println(yml.toString());
+                // System.out.println(yml.toString());
             }
             catch (FileNotFoundException e) {
             System.out.printf("File \"%s\" was not found.\n", filename);
@@ -26,50 +31,50 @@ public class App {
                 System.out.println("Invalid number in file: " + e.getMessage());
             }
         }
-        // colocar o resto num else?
-        
-        // Quantidade de servidores disponíveis para o atendimento da fila1
-        int qtdServidores1 = Integer.parseInt(args[0]);
-        // Tamanho máximo da fila1
-        int K1 = Integer.parseInt(args[1]);
-        
-        // Quantidade de servidores disponíveis para o atendimento da fila2
-        int qtdServidores2 = Integer.parseInt(args[2]);
-        // Tamanho máximo da fila2
-        int K2 = Integer.parseInt(args[3]);
+
+        ArrayList<String> chavesFila = new ArrayList<>();
+        yml.queues.forEach((chave, valor) -> {
+            chavesFila.add(chave);
+        });
+
+        for (String chave : chavesFila) {
+            YmlReader.ConfigFila aux = yml.queues.get(chave);
+            listaFilas.add(new Fila(
+                chave,
+                aux.servers,
+                aux.capacity,
+                aux.minArrival,
+                aux.maxArrival,
+                aux.minService,
+                aux.maxService
+            ));
+        }
+
+        for (Route rota : yml.network) {
+            int aux = buscaIndexQueues(listaFilas, rota.source);
+            listaFilas.get(aux).addRotas(rota);
+        }
 
         // Tempo total da simulação
         double tempoGlobal = 0;
         // Criação do escalonador, nele fica guardado os próximos eventos, ele decide qual será o próximo pelo tempo mais recente
         Escalonador esc = new Escalonador();
-        // Variáveis para o cálculo dos valores pseudoaleatórios de tempo de chegada
-        double minArrival = 1, maxArrival = 5;
-        // Variáveis para o cálculo dos valores pseudoaleatórios de tempo de passagem
-        double minPass = 4, maxPass = 5;
-        // Variáveis para o cálculo dos valores pseudoaleatórios de tempo de saída
-        double minService = 1, maxService = 3;
         // Variável auxiliar para guardar o tempo que se passou do último evento para inserir na lista de tempos
         double tempoAux = 0;
-
-        if (args.length < 4) {
-            System.out.println("Erro. Insira no formato:\n java App <qtdServidores1> <K1> <qtdServidores2> <K2>");
-            System.exit(0);
-        }
 
         // Esses valores precisam ser alterador para o teste
         Aleatorio rnd = new Aleatorio(1103, 12345, 429496, 157987);
 
-        ArrayList<Fila> listaFilas = new ArrayList<>();
-
-        // Inicia um evento inicial para inserir uma chegada de cliente novo no tempo desejado
-        Evento inicio = new Evento(2.5, Tipo.CHEGADA, -1, 1);
-        esc.add(inicio);
+        // Insere os eventos iniciais para o início da execução da fila
+        for (String chave : yml.arrivals.keySet()) {
+            esc.add(new Evento(yml.arrivals.get(chave), Tipo.CHEGADA, -1, buscaIndexQueues(listaFilas, chave)));
+        }
 
         //Criação da fila1 (será a que os clientes chegarão primeiro)
-        Fila fila1 = new Fila(qtdServidores1, K1);
+        Fila fila1 = new Fila("",0, 0, 0, 0,0,0);
 
         // Criação da fila2 (irá ser a atendida pelos servidores após passar pela fila1)
-        Fila fila2 = new Fila(qtdServidores2, K2);
+        Fila fila2 = new Fila("",0, 0,0,0,0,0);
 
         int count = 100000;
         while (count > 0) {
@@ -80,31 +85,43 @@ public class App {
 
             tempoAux = evento.tEntrada - tempoGlobal;
             tempoGlobal = evento.tEntrada;
+
+            for (Fila fila : listaFilas) {
+                fila.incTempo(tempoAux);
+            }
+
+            Fila filaOrigem = listaFilas.get(evento.filaOrigem);
+            String chaveOrigem = filaOrigem.getId();
+            Fila filaDestino = listaFilas.get(evento.filaDestino);
+            String chaveDestino = filaDestino.getId();
             
-            fila1.incTempo(tempoAux);
-            fila2.incTempo(tempoAux);
+            double minPass=0, maxPass=0, minArrival=0, maxArrival=0, minService=0, maxService = 0;
+
 
             switch (evento.tipo) {
                 case Tipo.CHEGADA:
-                    if (fila1.status() < fila1.capacity()) {
-                        fila1.in();
-                        if (fila1.status() <= fila1.servers()) {
-                            esc.add(new Evento(tempoGlobal + rnd.aleatorio(minPass, maxPass), Tipo.PASSAGEM));
+                    if (filaDestino.status() < filaDestino.capacity()) {
+                        filaDestino.in();
+                        if (filaDestino.status() <= filaDestino.servers()) {
+                            if (rnd.aleatorio(0, 1) < filaDestino.getRotas()) {
+
+                            }
+                            esc.add(new Evento(tempoGlobal + rnd.aleatorio(minPass, maxPass), Tipo.PASSAGEM, listaFilas.indexOf(filaOrigem), 0));
                         }
                     } else {
                         fila1.incLoss();
                     }
-                    esc.add(new Evento(tempoGlobal + rnd.aleatorio(minArrival,maxArrival), Tipo.CHEGADA));
+                    esc.add(new Evento(tempoGlobal + rnd.aleatorio(minArrival,maxArrival), Tipo.CHEGADA,0,0));
                     break;
                 case Tipo.PASSAGEM:
                     fila1.out();
                     if (fila1.status() >= fila1.servers()) {
-                        esc.add(new Evento(tempoGlobal + rnd.aleatorio(minPass, maxPass), Tipo.PASSAGEM));
+                        esc.add(new Evento(tempoGlobal + rnd.aleatorio(minPass, maxPass), Tipo.PASSAGEM,0,0));
                     }
                     if (fila2.status() < fila2.capacity()) {
                         fila2.in();
                         if (fila2.status() <= fila2.servers()) {
-                            esc.add(new Evento(tempoGlobal + rnd.aleatorio(minService, maxService), Tipo.SAIDA));
+                            esc.add(new Evento(tempoGlobal + rnd.aleatorio(minService, maxService), Tipo.SAIDA,0,0));
                         }
                     } else {
                         fila2.incLoss();
@@ -113,7 +130,7 @@ public class App {
                 case Tipo.SAIDA:
                     fila2.out();
                     if (fila2.status() >= fila2.servers()) {
-                        esc.add(new Evento(tempoGlobal + rnd.aleatorio(minService, maxService), Tipo.SAIDA));
+                        esc.add(new Evento(tempoGlobal + rnd.aleatorio(minService, maxService), Tipo.SAIDA,0,0));
                     }
                     break;
             
@@ -124,25 +141,25 @@ public class App {
         }
 
         System.out.println("============================================");
-        System.out.println("Fila1 (G/G/" + qtdServidores1 + "/" + K1 + ")");
-        System.out.println("Chegada: " + minArrival + " ... " + maxArrival);
-        System.out.println("Passagem: " + minPass + " ... " + maxPass);
+        System.out.println("Fila1 (G/G/" + 0 + "/" + 0 + ")");
+        System.out.println("Chegada: " + 0 + " ... " + 0);
+        System.out.println("Passagem: " + 0 + " ... " + 0);
         System.out.println("============================================");
 
         System.out.println("Tempos da fila 1: ");
         double tempos[] = fila1.getTimes();
-        for (int i = 0; i < K1 + 1; i++) {
+        for (int i = 0; i < 0 + 1; i++) {
             System.out.println(i + ": " + tempos[i] + " (" + ((tempos[i]/tempoGlobal)*100) + "%)");
         }
         
         System.out.println("\n============================================");
-        System.out.println("Fila2 (G/G/" + qtdServidores2 + "/" + K2 + ")");
-        System.out.println("Saida: " + minService + " ... " + maxService);
+        System.out.println("Fila2 (G/G/" + 0 + "/" + 0 + ")");
+        System.out.println("Saida: " + 0 + " ... " + 0);
         System.out.println("============================================");
 
         System.out.println("Tempos da fila 2: ");
         double tempos2[] = fila2.getTimes();
-        for (int i = 0; i < K2 + 1; i++) {
+        for (int i = 0; i < 0 + 1; i++) {
             System.out.println(i + ": " + tempos2[i] + " (" + ((tempos2[i]/tempoGlobal)*100) + "%)");
         }
         int perdaTotal = fila1.loss()+fila2.loss();
@@ -151,4 +168,23 @@ public class App {
         System.out.println("(Perdidos fila2: " + fila2.loss() + ")");
         System.out.println("Tempo total em simulação: " + tempoGlobal);
     }
+
+    public static int buscaIndexQueues(ArrayList<Fila> listaFilas, String chave) {
+        for (int i = 0; i < listaFilas.size(); i++) {
+            if (listaFilas.get(i).getId().equals(chave)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static Route buscaIndexNetwork(List<Route> network, String chave) {
+        for (int i = 0; i < network.size(); i++) {
+            if (network.get(i).source.equals(chave)) {
+                return network.get(i);
+            }
+        }
+        return null;
+    }
+
 }

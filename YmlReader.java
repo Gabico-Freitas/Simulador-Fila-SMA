@@ -27,17 +27,6 @@ public class YmlReader {
         }
     }
 
-    public static class Route {
-        public String source;
-        public String target;
-        public double prob;
-
-        @Override
-        public String toString() {
-            return String.format("%s -> %s (%.2f)", source, target, prob);
-        }
-    }
-
     public Map<String, Double> arrivals = new LinkedHashMap<>();
     public Map<String, ConfigFila> queues = new LinkedHashMap<>();
     public List<Route> network = new ArrayList<>();
@@ -54,7 +43,7 @@ public class YmlReader {
         SEEDS
     }
 
-    public static YmlReader read(File f) throws FileNotFoundException {
+    public YmlReader read(File f) throws FileNotFoundException {
         YmlReader data = new YmlReader();
         Block b = Block.NONE;
         ConfigFila currentQ = null;
@@ -171,7 +160,7 @@ public class YmlReader {
         return i < 0 ? "" : s.substring(i + 1).trim();
     }
 
-    public static void main(String[] args) {
+    public void main(String[] args) {
         if (args.length == 0) {
             throw new InvalidParameterException("Please specify the file name.");
         }

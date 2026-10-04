@@ -10,4 +10,12 @@ public class Evento {
         this.filaOrigem = filaOrigem;
         this.filaDestino = filaDestino;
     }
+
+    @Override
+    public String toString() {
+        return "Evento [tEntrada=" + tEntrada + ", tipo=" + tipo + ", filaOrigem=" + filaOrigem + ", filaDestino="
+                + filaDestino + "]";
+    }
+
+    
 }
