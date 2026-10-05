@@ -10,11 +10,16 @@ public class Aleatorio {
         this.M = M;
         this.anterior = seed;
     }
+
+    public void setSeed(int seed) {
+        this.anterior = seed;
+    }
     
     // Cria o valor pseudo aleatório
     private double NextRandom(){
         anterior = (a*anterior+c)%M;
         return (double)anterior/M;
+        
     }
 
     // Calcula o próximo tempo para o evento

@@ -11,6 +11,7 @@ public class Fila{
     private int loss; // contador para a quantidade de clientes perdidos
     private double times[]; // vetor dos tempos acumulados para cada estado da fila
     private List<Route> rotas;
+    private double tempoGlobal;
 
     public Fila (String id, int server, int capacity, double minArrival, double maxArrival, double minService, double maxService) {
         this.id = id;
@@ -24,6 +25,36 @@ public class Fila{
         this.loss = 0;
         this.times = new double[capacity+1];
         this.rotas = new ArrayList<Route>();
+        this.tempoGlobal = 0;
+    }
+
+   @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        String separador = "============================================";
+
+        sb.append(separador).append("\n");
+        sb.append(getId())
+        .append(" (G/G/").append(servers())
+        .append("/").append(capacity()).append(")\n");
+        sb.append("Chegada: ").append(minArrival).append(" ... ").append(maxArrival).append("\n");
+        sb.append("Passagem: ").append(minService).append(" ... ").append(maxService).append("\n");
+        sb.append(separador).append("\n");
+
+        sb.append("Tempos da fila ").append(getId()).append("\n");
+        double[] tempos = getTimes();
+        for (int i = 0; i < times.length; i++) {
+            sb.append(i).append(": ")
+            .append(tempos[i])
+            .append(" (").append((tempos[i] / tempoGlobal) * 100).append("%)\n");
+        }
+        sb.append("Perda " + loss());
+
+        return sb.toString();
+    }
+
+    public void setTempoGlobal(double tempoGlobal) {
+        this.tempoGlobal = tempoGlobal;
     }
 
     public void addRotas(Route rota) {
@@ -32,6 +63,22 @@ public class Fila{
 
     public List<Route> getRotas() {
         return rotas;
+    }
+
+    public double minArrival() {
+        return minArrival;
+    }
+
+    public double maxArrival() {
+        return maxArrival;
+    }
+
+    public double minService() {
+        return minService;
+    }
+
+    public double maxService() {
+        return maxService;
     }
 
     public String getId() {

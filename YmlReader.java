@@ -30,7 +30,6 @@ public class YmlReader {
     public Map<String, Double> arrivals = new LinkedHashMap<>();
     public Map<String, ConfigFila> queues = new LinkedHashMap<>();
     public List<Route> network = new ArrayList<>();
-    public List<Double> rndnumbers = new ArrayList<>();
     public int rndnumbersPerSeed = 0;
     public List<Integer> seeds = new ArrayList<>();
 
@@ -131,11 +130,6 @@ public class YmlReader {
                             }
                             break;
 
-                        case RNDNUMBERS:
-                            if (t.startsWith("-"))
-                                data.rndnumbers.add(Double.parseDouble(t.substring(1).trim()));
-                            break;
-
                         case SEEDS:
                             if (t.startsWith("-"))
                                 data.seeds.add(Integer.parseInt(t.substring(1).trim()));
@@ -178,9 +172,6 @@ public class YmlReader {
 
             System.out.println("== network ==");
             d.network.forEach(System.out::println);
-
-            System.out.println("== rndnumbers ==");
-            System.out.println(d.rndnumbers);
 
             System.out.println("rndnumbersPerSeed: " + d.rndnumbersPerSeed);
             System.out.println("seeds: " + d.seeds);
