@@ -23,7 +23,11 @@ public class Fila{
         this.maxService = maxService;
         this.costumers = 0;
         this.loss = 0;
-        this.times = new double[capacity+1];
+        if (capacity < 0) {
+            this.times = new double[1000000];
+        } else {
+            this.times = new double[capacity+1];
+        }
         this.rotas = new ArrayList<Route>();
         this.tempoGlobal = 0;
     }
@@ -44,6 +48,7 @@ public class Fila{
         sb.append("Tempos da fila ").append(getId()).append("\n");
         double[] tempos = getTimes();
         for (int i = 0; i < times.length; i++) {
+            if(tempos[i] == 0.0) break;
             sb.append(i).append(": ")
             .append(tempos[i])
             .append(" (").append((tempos[i] / tempoGlobal) * 100).append("%)\n");

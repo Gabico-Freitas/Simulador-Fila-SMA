@@ -12,7 +12,7 @@ public class YmlReader {
     public static class ConfigFila {
         public String id;
         public int servers = -1;
-        public int capacity = Integer.MAX_VALUE;
+        public int capacity = -1;
         public double minArrival = -1;
         public double maxArrival = -1;
         public double minService = -1;
