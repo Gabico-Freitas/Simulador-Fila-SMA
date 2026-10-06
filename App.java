@@ -204,8 +204,6 @@ public class App {
             System.out.println(f);
         }
         System.out.println("Tempo total em simulação: " + tempoGlobal);
-
-        System.out.println(rnd.sorteios);
     }
 
     public static int buscaIndexQueues(ArrayList<Fila> listaFilas, String chave) {
