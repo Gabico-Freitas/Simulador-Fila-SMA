@@ -91,8 +91,10 @@ public class App {
             esc.add(new Evento(yml.arrivals.get(chave), Tipo.CHEGADA, -1, buscaIndexQueues(listaFilas, chave)));
         }
 
-        int count = yml.rndnumbersPerSeed;
-        while (count > 0) {
+        long limite = yml.rndnumbersPerSeed;
+        rnd.setLimite(limite);
+
+        while (rnd.hasNext()) {
             Evento evento = esc.getProxEvento(); //Verifica o escalonador para pegar o próximo evento
 
             // Insere o tempo que se passou entre o evento anterior ao evento a ocorrer no momento
@@ -192,12 +194,8 @@ public class App {
                 default:
                     break;
             }
-            count--;
-            if (count == 0) {
-                if (!sementes.isEmpty()) {
-                    count = yml.rndnumbersPerSeed;
+            if (!rnd.hasNext() && !sementes.isEmpty()) {
                     rnd.setSeed(sementes.poll());
-                }
             }
         }
 
@@ -206,6 +204,8 @@ public class App {
             System.out.println(f);
         }
         System.out.println("Tempo total em simulação: " + tempoGlobal);
+
+        System.out.println(rnd.sorteios);
     }
 
     public static int buscaIndexQueues(ArrayList<Fila> listaFilas, String chave) {

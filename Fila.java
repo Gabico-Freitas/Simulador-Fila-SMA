@@ -51,9 +51,11 @@ public class Fila{
         double[] tempos = getTimes();
         for (int i = 0; i < times.length; i++) {
             if(tempos[i] == 0.0) break;
+            double valor = (tempos[i] / tempoGlobal) * 100;
+            String valorPercent = String.format("%.2f", valor);
             sb.append(i).append(": ")
             .append(tempos[i])
-            .append(" (").append((tempos[i] / tempoGlobal) * 100).append("%)\n");
+            .append(" (").append(valorPercent).append("%)\n");
         }
         sb.append("Perda " + loss());
 

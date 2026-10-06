@@ -3,6 +3,8 @@ public class Aleatorio {
     private int c;
     private int M;
     private int anterior;
+    public long sorteios = 0;
+    private long limite;
 
     public Aleatorio(int a, int c, int M, int seed) {
         this.a = a;
@@ -11,13 +13,21 @@ public class Aleatorio {
         this.anterior = seed;
     }
 
+    public void setLimite(long limite) {
+        this.limite = limite;
+    }
+
+    public boolean hasNext() { return sorteios < limite; }
+
     public void setSeed(int seed) {
         this.anterior = seed;
+        this.sorteios = 0;
     }
     
     // Cria o valor pseudo aleatório
     private double NextRandom(){
         anterior = (a*anterior+c)%M;
+        sorteios++;
         return (double)anterior/M;
         
     }
