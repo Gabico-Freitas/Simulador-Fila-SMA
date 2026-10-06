@@ -9,7 +9,7 @@ public class App {
     // ******************************************
     // PARA RODAR:
     //      Compilar: javac *.java
-    //      Executar: java App <qtdServidores1> <K1> <qtdServidores2> <K2>
+    //      Executar: java App -filename <arquivo.yml>
     // ******************************************
 
     public static void main(String[] args) {
@@ -72,7 +72,10 @@ public class App {
             sementes.add(seeds);
         }
 
-        Aleatorio rnd = new Aleatorio(1103, 12345, 429496, sementes.poll());
+        int seed = 0;
+        if (!sementes.isEmpty()) seed = sementes.poll();
+        Aleatorio rnd = new Aleatorio(1103, 12345, 429496, seed);
+
 
         // Tempo total da simulação
         double tempoGlobal = 0;
