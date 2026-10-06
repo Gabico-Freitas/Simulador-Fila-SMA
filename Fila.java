@@ -16,7 +16,6 @@ public class Fila{
     public Fila (String id, int server, int capacity, double minArrival, double maxArrival, double minService, double maxService) {
         this.id = id;
         this.server = server;
-        this.capacity = capacity;
         this.minArrival = minArrival;
         this.maxArrival = maxArrival;
         this.minService = minService;
@@ -24,8 +23,10 @@ public class Fila{
         this.costumers = 0;
         this.loss = 0;
         if (capacity < 0) {
+            this.capacity = Integer.MAX_VALUE;
             this.times = new double[1000000];
         } else {
+            this.capacity = capacity;
             this.times = new double[capacity+1];
         }
         this.rotas = new ArrayList<Route>();
@@ -39,8 +40,9 @@ public class Fila{
 
         sb.append(separador).append("\n");
         sb.append(getId())
-        .append(" (G/G/").append(servers())
-        .append("/").append(capacity()).append(")\n");
+        .append(" (G/G/").append(servers());
+        if (capacity != Integer.MAX_VALUE) sb.append("/").append(capacity()).append(")\n");
+            else sb.append(")\n");
         sb.append("Chegada: ").append(minArrival).append(" ... ").append(maxArrival).append("\n");
         sb.append("Passagem: ").append(minService).append(" ... ").append(maxService).append("\n");
         sb.append(separador).append("\n");
