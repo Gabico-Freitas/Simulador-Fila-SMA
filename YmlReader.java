@@ -1,6 +1,5 @@
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -152,35 +151,5 @@ public class YmlReader {
     private static String value(String s) {
         int i = s.indexOf(':');
         return i < 0 ? "" : s.substring(i + 1).trim();
-    }
-
-    public void main(String[] args) {
-        if (args.length == 0) {
-            throw new InvalidParameterException("Please specify the file name.");
-        }
-        String filename = args[0];
-        File f = new File(filename);
-
-        try {
-            YmlReader d = read(f);
-
-            System.out.println("== arrivals ==");
-            d.arrivals.forEach((q, t) -> System.out.println(q + ": " + t));
-
-            System.out.println("== queues ==");
-            d.queues.values().forEach(System.out::println);
-
-            System.out.println("== network ==");
-            d.network.forEach(System.out::println);
-
-            System.out.println("rndnumbersPerSeed: " + d.rndnumbersPerSeed);
-            System.out.println("seeds: " + d.seeds);
-        }
-        catch (FileNotFoundException e) {
-            System.out.printf("File \"%s\" was not found.\n", filename);
-        }
-        catch (NumberFormatException e) {
-            System.out.println("Invalid number in file: " + e.getMessage());
-        }
     }
 }
